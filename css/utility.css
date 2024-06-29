@@ -1,0 +1,67 @@
+.border{
+    border: 2px solid red;
+    margin: 3px;
+}
+ 
+.flex{
+    display: flex;
+}
+
+.justify-center{
+    justify-content: center;
+}
+
+.item-center{
+    align-items: center;
+}
+
+.bg-black{
+    background-color: black;
+    color: white;
+}
+
+.invert{
+    filter: invert(1);
+}
+
+.bg-gray{
+    background-color: #121212;
+}
+
+.rounded{
+    border-radius: 7px;
+}
+
+.m-1{
+    margin: 5px;
+}
+
+.p-1{
+    padding: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2e2e2e; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: #575757; 
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #424242; 
+}
+
+html {
+    scrollbar-width: thin; 
+    scrollbar-color: #575757 #2e2e2e; 
+}
+
+body {
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
