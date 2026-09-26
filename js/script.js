@@ -21,7 +21,7 @@ function secondsToMinutesSeconds(seconds) {
 
 async function getSongs(folder) {
   currFolder = folder;
-  let a = await fetch(`http://127.0.0.1:3000/${folder}/`);
+  let a = await fetch(`/${folder}/`);
   let response = await a.text();
   let div = document.createElement("div");
   div.innerHTML = response;
@@ -55,7 +55,7 @@ async function getSongs(folder) {
 
   // Attach an event listner to eeach song
   Array.from(
-    document.querySelector(".songList").getElementsByTagName("li")
+    document.querySelector(".songList").getElementsByTagName("li"),
   ).forEach((e) => {
     e.addEventListener("click", (element) => {
       playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim());
@@ -77,25 +77,29 @@ const playMusic = (track, pause = false) => {
 };
 
 async function displayAlbums() {
-  let a = await fetch(`http://127.0.0.1:3000/songs/`);
+  let a = await fetch(`/songs/`);
   let response = await a.text();
   let div = document.createElement("div");
   div.innerHTML = response;
-  let achors = div.getElementsByTagName("a");
+  let anchors = div.getElementsByTagName("a");
   let cardContainer = document.querySelector(".cardContainer");
-  let array = Array.from(achors);
+
+  let array = Array.from(anchors);
   for (let index = 0; index < array.length; index++) {
     const e = array[index];
-    if (e.href.includes("/songs")) {
-      let folder = e.href.split("/").slice(-2)[0];
 
-      // Get the metadata of the folder
-      let a = await fetch(`http://127.0.0.1:3000/songs/${folder}/info.json`);
-      let response = await a.json();
-      console.log(response);
-      cardContainer.innerHTML =
-        cardContainer.innerHTML +
-        `<div data-folder="${folder}" class="card">
+    // Check if the link contains /songs/ and is not the parent directory link
+    if (e.href.includes("/songs/") && !e.href.endsWith("/songs/")) {
+      let folder = e.href.split("/").filter(Boolean).slice(-1)[0];
+
+      // Fetch folder metadata
+      try {
+        let a = await fetch(`/songs/${folder}/info.json`);
+        let response = await a.json();
+
+        cardContainer.innerHTML =
+          cardContainer.innerHTML +
+          `<div data-folder="${folder}" class="card">
               <div class="play">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -123,6 +127,11 @@ async function displayAlbums() {
               <h2>${response.title}</h2>
               <p>${response.description}</p>
             </div>`;
+      } catch (err) {
+        console.log(
+          `Skipping non-album folder or missing info.json: ${folder}`,
+        );
+      }
     }
   }
 
@@ -157,7 +166,7 @@ async function main() {
   // Listen for timeupdate event
   currentSong.addEventListener("timeupdate", () => {
     document.querySelector(".songtime").innerHTML = `${secondsToMinutesSeconds(
-      currentSong.currentTime
+      currentSong.currentTime,
     )}
       / ${secondsToMinutesSeconds(currentSong.duration)} `;
     document.querySelector(".circle").style.left =
@@ -218,15 +227,13 @@ async function main() {
     if (e.target.src.includes("volume.svg")) {
       e.target.src = e.target.src.replace("volume.svg", "mute.svg");
       currentSong.volume = 0;
-      document
-        .querySelector(".range")
-        .getElementsByTagName("input")[0].value = 0;
+      document.querySelector(".range").getElementsByTagName("input")[0].value =
+        0;
     } else {
       e.target.src = e.target.src.replace("mute.svg", "volume.svg");
       currentSong.volume = 0.1;
-      document
-        .querySelector(".range")
-        .getElementsByTagName("input")[0].value = 20;
+      document.querySelector(".range").getElementsByTagName("input")[0].value =
+        20;
     }
   });
 }
